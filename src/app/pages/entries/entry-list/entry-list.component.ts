@@ -1,0 +1,37 @@
+import { Entry } from './../shared/entry.model';
+import { EntryService } from './../shared/entry.service';
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+    selector: 'app-entry-list',
+    templateUrl: './entry-list.component.html',
+    styleUrls: ['./entry-list.component.scss']
+})
+export class EntryListComponent implements OnInit {
+
+    entries: Entry[] = [];
+
+    constructor(private entryService: EntryService) { }
+
+    ngOnInit(): void {
+        this.entryService.getAll().subscribe(
+            entries => this.entries = entries.sort((a, b) => b.id - a.id),
+            error => alert('Erro ao carregar a lista')
+        );
+    }
+
+    deleteEntry(entry: Entry): void {
+        const mustDelete = confirm('Deseja realmente exlcuir este item?');
+
+        if (mustDelete) {
+            this.entryService.delete(entry.id).subscribe(
+                () => this.reloadEntries(entry),
+                () => alert('Erro ao tentar excluir')
+            );
+        }
+    }
+
+    reloadEntries(entryExcluded: Entry): void {
+        this.entries = this.entries.filter(item => item !== entryExcluded);
+    }
+}

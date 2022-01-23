@@ -1,3 +1,4 @@
+import { SharedModule } from './../../shared/shared.module';
 import { EntryListComponent } from './entry-list/entry-list.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -15,9 +16,8 @@ import { IMaskModule } from 'angular-imask';
         EntryFormComponent
     ],
     imports: [
-        CommonModule,
+        SharedModule,
         EntriesRoutingModule,
-        ReactiveFormsModule,
         CalendarModule,
         IMaskModule
     ]

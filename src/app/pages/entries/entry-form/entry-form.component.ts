@@ -1,32 +1,30 @@
+import { CreditCardService } from './../../cards/shared/credit-card.service';
+import { TypeOfPayments } from '../shared/type-of-payments.enum';
 import { CategoryService } from './../../categories/shared/category.service';
 import { Category } from './../../categories/shared/category.model';
 import { EntryService } from './../shared/entry.service';
 import { Entry } from './../shared/entry.model';
-import { Component, OnInit, AfterContentChecked } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { switchMap } from 'rxjs/operators';
-import toastr from 'toastr';
+import { Component, Injector, OnInit } from '@angular/core';
+import { Validators } from '@angular/forms';
+import { BaseResourceFormComponent } from 'src/app/shared/components/base-resource-form/base-resource-form.component';
+import { CreditCard } from '../../cards/shared/credit-card.model';
 
 @Component({
     selector: 'app-entry-form',
     templateUrl: './entry-form.component.html',
     styleUrls: ['./entry-form.component.scss']
 })
-export class EntryFormComponent implements OnInit, AfterContentChecked {
+export class EntryFormComponent extends BaseResourceFormComponent<Entry> implements OnInit {
 
-    currentAction: string;
-    entryForm: FormGroup;
-    pageTitle: string;
-    serverErrorMessages: string[] = null;
-    submittingForm: boolean = false;
-    entry: Entry = new Entry();
     categories: Array<Category>;
+    creditCards: Array<CreditCard>;
+    typeOptions: Array<any>;
+    CREDIT_CARD = TypeOfPayments.CARTAO_CREDITO;
 
     imaskConfig = {
         mask: Number,
         scale: 2,
-        thousandsSeparator: '.',
+        thousandsSeparator: '',
         padFractionalZeros: true,
         normalizeZeros: true,
         radix: ','
@@ -46,58 +44,44 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
         clear: 'Limpar'
     };
 
+    typeOfPaymentsList = Object.keys(TypeOfPayments).map(key => TypeOfPayments[key]);
+
     constructor(
-        private entryService: EntryService,
-        private activateRoute: ActivatedRoute,
-        private router: Router,
-        private formBuilder: FormBuilder,
-        private categoryService: CategoryService,
-    ) { }
+        protected entryService: EntryService,
+        protected categoryService: CategoryService,
+        protected creditCardService: CreditCardService,
+        protected injector: Injector
+    ) { 
+        super(injector, new Entry(), entryService, Entry.fromJson);
+        // console.log(Object.keys(TypeOfPayments).map(key => TypeOfPayments[key]));
+    }
 
 
     ngOnInit(): void {
-        this.setCurrentAction();
-        this.buildEntryForm();
-        this.loadEntry();
+        super.ngOnInit();
         this.loadCategories();
+        this.loadCreditCards();
+        this.loadTypeEntries();
     }
 
-    ngAfterContentChecked(): void {
-        this.setPageTitle();
-    }
-
-    submitForm(): void {
-        this.submittingForm = true;
-
-        if (this.currentAction === 'new') {
-            this.createEntry();
-        } else {
-            this.updateEntry();
-        }
-    }
-
-    get typeOptions(): Array<any> {
-        return Object.entries(Entry.types).map(
+    loadTypeEntries() {
+        this.typeOptions = Object.entries(Entry.types).map(
             ([value, text]) => {
                 return {
                     text,
                     value
-                };
+                }
             }
         );
     }
 
-    // PRIVATE METHODS
-    private setCurrentAction(): void {
-        if (this.activateRoute.snapshot.url[0].path === 'new') {
-            this.currentAction = 'new';
-        } else {
-            this.currentAction = 'edit';
-        }
+    changeTypeOfPayment(typePayment: string): void {
+        this.resourceForm.get('typeOfPayment').setValue(typePayment);
+        this.resourceForm.get('creditCard').setValue(null);
     }
 
-    private buildEntryForm(): void {
-        this.entryForm = this.formBuilder.group({
+    protected buildResourceForm(): void {
+        this.resourceForm = this.formBuilder.group({
             id: [null],
             name: [null, [Validators.required, Validators.minLength(2)]],
             description: [null],
@@ -106,23 +90,9 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
             date: [null, [Validators.required]],
             paid: [true, [Validators.required]],
             categoryId: [null, [Validators.required]],
+            typeOfPayment: [null],
+            creditCard: [null]
         });
-    }
-
-    private loadEntry(): void {
-        if (this.currentAction === 'edit') {
-            this.activateRoute.paramMap.pipe(
-                switchMap(params => this.entryService.getById(+params.get('id'))) // O '+' faz um cast para o tipo number
-            )
-            .subscribe(
-                (entry) => {
-                    this.entry = entry;
-                    this.entryForm.patchValue(entry); // Carrega a categoria, obtida do banco para o formulário
-                },
-                (error) => alert('Ocorreu um erro no servidor, tente mais tarde')
-            );
-
-        }
     }
 
     private loadCategories(): void {
@@ -131,50 +101,24 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
         );
     }
 
-    private setPageTitle(): void {
-        if (this.currentAction === 'new') {
-            this.pageTitle = 'Cadastro de Novo Lançamento';
-        } else {
-            const entryName = this.entry.name || '';
-            this.pageTitle = `Editando Lançamento: ${entryName}`;
-        }
-    }
-
-    private createEntry(): void {
-        const entry: Entry = Object.assign(new Entry(), this.entryForm.value);
-
-        this.entryService.create(entry).subscribe(
-            entrySave => this.actionsForSuccess(entrySave),
-            error => this.actionsForError(error)
+    private loadCreditCards(): void {
+        this.creditCardService.getAll().subscribe(
+            creditCards =>  this.creditCards = creditCards
         );
     }
 
-    private updateEntry(): void {
-        const entry: Entry = Object.assign(new Entry(), this.entryForm.value);
-
-        this.entryService.update(entry).subscribe(
-            entrySave => this.actionsForSuccess(entrySave),
-            error => this.actionsForError(error)
-        );
+    protected creationPageTitle(): string {
+       return 'Cadastro de Novo Lançamento';
     }
 
-    private async actionsForSuccess(entry: Entry) {
-        toastr.success('Solicitação processada com sucesso!');
-
-        // redirect/reload component page, forçar para esse componente ser completamente recarregado
-        // skipLocationChange, para não adicionar a rota no historico de navegação do browser
-        await this.router.navigateByUrl('entries', { skipLocationChange: true });
-        this.router.navigate(['entries', entry.id, 'edit']);
+    protected editionPageTitle(): string {
+        const entryName: string = this.resource.name || '';
+        return `Editando Lançamento: ${entryName}`;
     }
 
-    private actionsForError(error: any): void {
-        toastr.error('Ocorreu um erro ao processar a sua solicitação');
-        this.submittingForm = false;
-
-        if (error.status === 422) {
-            this.serverErrorMessages = JSON.parse(error._body).console.errors;
-        } else {
-            this.serverErrorMessages = ['Falha na comunicação com o servidor. Por favor tente mais tarde.'];
-        }
+    onChangeEntryType(): void {
+        this.resourceForm.get('creditCard').setValue(null);
+        this.resourceForm.get('typeOfPayment').setValue(null);        
     }
+
 }

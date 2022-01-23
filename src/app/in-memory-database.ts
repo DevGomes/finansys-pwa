@@ -1,4 +1,5 @@
 import { InMemoryDbService } from 'angular-in-memory-web-api';
+import { CreditCard } from './pages/cards/shared/credit-card.model';
 import { Category } from './pages/categories/shared/category.model';
 import { Entry } from './pages/entries/shared/entry.model';
 
@@ -29,9 +30,17 @@ export class InMemoryDatabase implements InMemoryDbService {
             { id: 22, name: 'Cinema', categoryId: categories[2].id, category: categories[2], paid: true, date: '18/11/2018', amount: '15,00', type: 'expense' } as Entry,
             { id: 23, name: 'Jiu Jitsu', categoryId: categories[1].id, category: categories[1], paid: false, date: '21/11/2018', amount: '130,00', type: 'expense' } as Entry,
             { id: 44, name: 'Uber', categoryId: categories[2].id, category: categories[2], paid: true, date: '28/11/2018', amount: '15,00', type: 'expense' } as Entry,
-            { id: 55, name: 'Cinema', categoryId: categories[1].id, category: categories[1], paid: false, date: '28/11/2018', amount: '30,00', type: 'expense' }  as Entry
+            { id: 55, name: 'Cinema', categoryId: categories[1].id, category: categories[1], paid: false, date: '28/11/2018', amount: '30,00', type: 'expense' }  as Entry,
+            { id: 57, name: 'Academia', categoryId: categories[1].id, category: categories[1], paid: true, date: '27/08/2021', amount: '108,00', type: 'expense' }  as Entry
         ];
 
-        return { categories, entries };
+        const creditCards: CreditCard [] = [
+            { id: 1, cardFlag: 'Mastercard', bankName: 'Santander' },
+            { id: 2, cardFlag: 'Mastercard', bankName: 'Nubank' },
+            { id: 3, cardFlag: 'Mastercard', bankName: 'Rener' },
+            { id: 4, cardFlag: 'Teste api memory', bankName: 'Teste' },
+        ];
+
+        return { categories, entries, creditCards };
     }
 }

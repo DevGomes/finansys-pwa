@@ -7,6 +7,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CategoriesModule } from './pages/categories/categories.module';
 import { CardsModule } from './pages/cards/cards.module';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 
 
@@ -20,7 +22,8 @@ import { CardsModule } from './pages/cards/cards.module';
         CategoriesModule,
         EntriesModule,
         ReportsModule,
-        CardsModule
+        CardsModule,
+        ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
     ],
     providers: [],
     bootstrap: [AppComponent]

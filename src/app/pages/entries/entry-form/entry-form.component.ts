@@ -8,6 +8,7 @@ import { Component, Injector, OnInit } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { BaseResourceFormComponent } from 'src/app/shared/components/base-resource-form/base-resource-form.component';
 import { CreditCard } from '../../cards/shared/credit-card.model';
+import { ptBRInputConfigCalender } from 'src/app/shared/models/input-config';
 
 @Component({
     selector: 'app-entry-form',
@@ -30,19 +31,7 @@ export class EntryFormComponent extends BaseResourceFormComponent<Entry> impleme
         radix: ','
     };
 
-    ptBR = {
-        firstDayOfWeek: 0,
-        dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
-        dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
-        dayNamesMin: ['Do', 'Se', 'Te', 'Qu', 'Qu', 'Se', 'Sa'],
-        monthNames: [
-            'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho',
-            'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-        ],
-        monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-        today: 'Hoje',
-        clear: 'Limpar'
-    };
+    ptBR: any;
 
     typeOfPaymentsList = Object.keys(TypeOfPayments).map(key => TypeOfPayments[key]);
 
@@ -53,7 +42,7 @@ export class EntryFormComponent extends BaseResourceFormComponent<Entry> impleme
         protected injector: Injector
     ) { 
         super(injector, new Entry(), entryService, Entry.fromJson);
-        // console.log(Object.keys(TypeOfPayments).map(key => TypeOfPayments[key]));
+        this.ptBR = ptBRInputConfigCalender;
     }
 
 

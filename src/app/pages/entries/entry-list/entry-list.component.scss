@@ -1,0 +1,18 @@
+.btn-filtrar {
+    margin-left: 1rem;
+    margin-bottom: 0.3rem;
+}
+
+.container-btns-filter {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    padding-top: 2rem;
+}
+
+.msg-without-entries {
+    text-align: center;
+    color: #1235;
+    font-weight: 500;
+    font-size: 1.2rem;
+}

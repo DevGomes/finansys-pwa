@@ -12,7 +12,26 @@
     button-class="btn-success">
 </app-page-header>
 
-<table class="table table-hover">
+<div class="card">
+    <div class="card-body">
+        <div class="form-row">
+            <div class="form-group col-md-2">
+                <label for="date">Data Referência</label>
+                <p-calendar id="date" dataType="string"
+                    dateFormat="mm/yy" [locale]="ptBR" [showButtonBar]="true" inputStyleClass="form-control"
+                    [(ngModel)]="referenceDate" [inputStyle]="{'height':'2.4rem', 'font-size': '1.5rem', 'font-weight': '600'}">
+                </p-calendar>
+            </div>
+
+            <div class="form-group col-md-4 container-btns-filter">
+                <button (click)="entriesFilter()" class="btn btn-primary btn-filtrar">Filtrar</button>
+                <button (click)="clearEntriesFilter()" class="btn btn-filtrar">Limpar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table table-hover" *ngIf="resourcesCopy.length > 0">
     <thead>
         <tr class="bg-primary text-light">
             <th>Lançamento</th>
@@ -22,7 +41,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let entry of resources">
+        <tr *ngFor="let entry of resourcesCopy">
             <td>
                 <strong>{{entry.name}}</strong><br>
                 <small class="text-success">{{entry.date}}</small> <br>
@@ -44,3 +63,9 @@
         </tr>
     </tbody>
 </table>
+
+<div class="card" *ngIf="resourcesCopy.length === 0" style="margin-top: 1rem;">
+    <div class="card-body msg-without-entries">
+        Nenhum lançamento foi encontrado
+    </div>
+</div>

@@ -1,4 +1,4 @@
-# Finansys
+# Finansys PWA
 
 Esse é um projeto estudo do curso Angular Avançado. Aplicação de controle financeiro que usa um banco de dados em memória, e exibe um pequeno relatório
 detalhando os tipos de despesas e receitas.  

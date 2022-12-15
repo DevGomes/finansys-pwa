@@ -4,6 +4,9 @@ Esse é um projeto estudo do curso Angular Avançado. Aplicação de controle fi
 detalhando os tipos de despesas e receitas.  
 O projeto também foi configurado para rodar em PWA.
 
+Aplicação rodando no link:
+https://finansys-pwa.herokuapp.com/
+
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.1.6.
 
